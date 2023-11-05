@@ -3,6 +3,7 @@ package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.khalbro.litemusicplayer.R
 import com.khalbro.litemusicplayer.databinding.ActivityMainBinding
@@ -24,6 +25,16 @@ class MainActivity : AppCompatActivity() {
         tracks = songsStorage.getSongs(assets)
         var isClicked = true
 
+        binding.tvSongTitle.text = songTitle()
+
+        binding.vSongCover.setBackgroundResource(songCover())
+
+        binding.btnPrevious.setOnClickListener {
+            previousAudio()
+            binding.tvSongTitle.text = songTitle()
+            binding.vSongCover.setBackgroundResource(songCover())
+        }
+
         binding.btnPlayPause.setOnClickListener {
             playAudio()
             tracks[currentTrackPosition]
@@ -40,6 +51,45 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnNext.setOnClickListener {
             nextAudio()
+            binding.tvSongTitle.text = songTitle()
+            binding.vSongCover.setBackgroundResource(songCover())
+        }
+    }
+
+    private fun songTitle(): String {
+        return tracks[currentTrackPosition]
+    }
+
+    private fun songCover(): Int {
+        return when (tracks[currentTrackPosition]) {
+            "game_of_thrones.mp3" -> R.drawable.game_of_thrones
+            "imperial_marsh.mp3" -> R.drawable.imperial_marsh
+            "harry_potter.mp3" -> R.drawable.harry_potter
+
+            else -> {
+                R.drawable.game_of_thrones
+            }
+        }
+    }
+
+    private fun previousAudio() {
+        val newPosition = currentTrackPosition - 1
+        currentTrackPosition = if (newPosition < 0) {
+            2
+
+        } else {
+            newPosition
+        }
+        if (isPlaying) {
+            if (player != null) {
+                player!!.pause()
+                isPlaying = false
+                playAudio()
+                songTitle()
+            } else {
+                isPlaying = true
+                songTitle()
+            }
         }
     }
 
@@ -50,30 +100,20 @@ class MainActivity : AppCompatActivity() {
         } else {
             newPosition
         }
-        playAudio()
-//        when (getRandomSong()) {
-//            SongNumber.ONE -> {
-//                player!!.pause()
-//                player = MediaPlayer.create(this, R.raw.harry_potter)
-//                player!!.start()
-//            }
-//
-//            SongNumber.TWO -> {
-//                player!!.pause()
-//                player = MediaPlayer.create(this, R.raw.imperial_marsh)
-//                player!!.start()
-//            }
-//
-//            SongNumber.TREE -> {
-//                player!!.pause()
-//                player = MediaPlayer.create(this, R.raw.game_of_thrones)
-//                player!!.start()
-//            }
-//        }
+        if (isPlaying) {
+            if (player != null) {
+                player!!.pause()
+                isPlaying = false
+                playAudio()
+                Log.d("Ololo", "nextAudio:$currentTrackPosition ")
+            } else {
+                isPlaying = true
+                Log.d("Ololo", "nextAudio:$currentTrackPosition ")
+            }
+        }
     }
 
     private fun playAudio() {
-
         if (isPlaying) {
             if (player != null) {
                 player!!.pause()
@@ -86,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                     player!!.start()
                     isPlaying = true
                 }
+
                 "imperial_marsh.mp3" -> {
                     player = MediaPlayer.create(this, R.raw.imperial_marsh)
                     player!!.start()
@@ -98,35 +139,9 @@ class MainActivity : AppCompatActivity() {
                     isPlaying = true
                 }
             }
-
-//    private fun getRawSong(): MediaPlayer {
-//
-//        return when (getRandomSong()) {
-//            SongNumber.ONE -> MediaPlayer.create(this, R.raw.harry_potter)
-//            SongNumber.TWO -> MediaPlayer.create(this, R.raw.imperial_marsh)
-//            SongNumber.TREE -> MediaPlayer.create(this, R.raw.game_of_thrones)
-//        }
-//    }
-//
-//    private fun getRandomSong(): SongNumber {
-//        val random = SongNumber.values()
-//        return random.random()
-//    }
-
-            //    private fun getRandomSongNumber(): List<Songs> {
-//       return emptyList()
-//    }
         }
     }
 }
-
-//data class Songs(val songNumber: SongNumber, val songTitle: String) {
-//    val songs = listOf(
-//        Songs(SongNumber.ONE, SongNumber.ONE.songTitle),
-//        Songs(SongNumber.TWO, SongNumber.TWO.songTitle),
-//        Songs(SongNumber.TREE, SongNumber.TREE.songTitle)
-//    )
-//}
 
 
 
