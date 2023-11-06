@@ -13,7 +13,7 @@ class MusicService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-K
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             Actions.START.toString() -> start()
