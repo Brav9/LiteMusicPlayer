@@ -1,13 +1,30 @@
 package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 
 import android.content.res.AssetManager
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.khalbro.litemusicplayer.R
 
 class SongsStorage : AppCompatActivity() {
-    fun getSongs(assetManager: AssetManager): List<String> {
+
+    var tracks = emptyList<String>()
+
+    private val covers = mapOf(
+        "game_of_thrones.mp3" to R.drawable.game_of_thrones,
+        "imperial_marsh.mp3" to R.drawable.imperial_marsh,
+        "harry_potter.mp3" to R.drawable.harry_potter
+    )
+
+    fun loadTracks(assetManager: AssetManager): List<String> {
         val files: Array<out String> = assetManager.list("tracks").orEmpty()
-        Log.d("Ololo", "getSongs: ${files.size}")
-        return files.toList()
+        tracks = files.toList()
+        return tracks
+    }
+
+    fun getSongCover(trackIndex: Int): Int? {
+        return covers[getSongTilte(trackIndex)]
+    }
+
+    fun getSongTilte(trackIndex: Int): String {
+        return tracks[trackIndex]
     }
 }
