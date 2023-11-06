@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
                 binding.btnPlayPause.text = getString(R.string.btn_pause)
                 startMusicService()
 
+
+
             } else {
                 binding.btnPlayPause.text = getString(R.string.btn_play)
                 isClicked = true
