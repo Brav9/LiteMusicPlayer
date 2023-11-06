@@ -1,12 +1,15 @@
 package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.khalbro.litemusicplayer.R
 import com.khalbro.litemusicplayer.databinding.ActivityMainBinding
+
+const val CHANNEL_ID = "ID"
+const val CHANNEL_NAME = "NAME"
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,19 +36,23 @@ class MainActivity : AppCompatActivity() {
             previousAudio()
             binding.tvSongTitle.text = songTitle()
             binding.vSongCover.setBackgroundResource(songCover())
+
         }
 
         binding.btnPlayPause.setOnClickListener {
             playAudio()
+
             tracks[currentTrackPosition]
             Log.d("Ololo", "onCreate:${tracks[currentTrackPosition]} ")
             if (isClicked) {
                 isClicked = false
                 binding.btnPlayPause.text = getString(R.string.btn_pause)
+                startMusicService()
 
             } else {
                 binding.btnPlayPause.text = getString(R.string.btn_play)
                 isClicked = true
+                stopMusicService()
             }
         }
 
@@ -65,7 +72,6 @@ class MainActivity : AppCompatActivity() {
             "game_of_thrones.mp3" -> R.drawable.game_of_thrones
             "imperial_marsh.mp3" -> R.drawable.imperial_marsh
             "harry_potter.mp3" -> R.drawable.harry_potter
-
             else -> {
                 R.drawable.game_of_thrones
             }
@@ -76,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         val newPosition = currentTrackPosition - 1
         currentTrackPosition = if (newPosition < 0) {
             2
-
         } else {
             newPosition
         }
@@ -139,6 +144,20 @@ class MainActivity : AppCompatActivity() {
                     isPlaying = true
                 }
             }
+        }
+    }
+
+    private fun startMusicService() {
+        Intent(applicationContext, MusicService::class.java).also {
+            it.action = MusicService.Actions.START.toString()
+            startService(it)
+        }
+    }
+
+    private fun stopMusicService() {
+        Intent(applicationContext, MusicService::class.java).also {
+            it.action = MusicService.Actions.STOP.toString()
+            startService(it)
         }
     }
 }
