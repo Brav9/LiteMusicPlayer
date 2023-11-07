@@ -3,6 +3,7 @@ package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.khalbro.litemusicplayer.R
 import com.khalbro.litemusicplayer.databinding.ActivityMainBinding
 
@@ -17,14 +18,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         var isClicked = true
 
-        binding.tvSongTitle.text = playerController.getSongTitle()
-        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
+        val songCoverObserver = Observer<Int> { newSongTitle ->
+            binding.vSongCover.setBackgroundResource(newSongTitle)
+        }
+
+        val songTitleObserver = Observer<String> { newSongTitle ->
+            binding.tvSongTitle.text = newSongTitle
+        }
+
+        playerController.currentSongTitleLiveData.observe(this, songTitleObserver)
+        playerController.currentSongCoverLiveData.observe(this, songCoverObserver)
+
 
         binding.btnPrevious.setOnClickListener {
             previousMusicService()
-
-            binding.tvSongTitle.text = playerController.getSongTitle()
-            binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         }
 
         binding.btnPlayPause.setOnClickListener {
@@ -43,14 +50,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnNext.setOnClickListener {
             nextMusicService()
-            binding.tvSongTitle.text = playerController.getSongTitle()
-            binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         }
     }
 
     private fun previousMusicService() {
-        binding.tvSongTitle.text = playerController.getSongTitle()
-        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         Intent(applicationContext, MusicService::class.java).also {
             it.action = MusicService.Actions.PREVIOUS_MUSIC.toString()
             startService(it)
@@ -58,8 +61,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nextMusicService() {
-        binding.tvSongTitle.text = playerController.getSongTitle()
-        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         Intent(applicationContext, MusicService::class.java).also {
             it.action = MusicService.Actions.NEXT_MUSIC.toString()
             startService(it)

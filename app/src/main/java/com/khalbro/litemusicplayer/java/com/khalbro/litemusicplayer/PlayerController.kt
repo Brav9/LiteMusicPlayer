@@ -1,11 +1,18 @@
 package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.khalbro.litemusicplayer.R
 
 object PlayerController {
 
+
     private var currentTrackPosition: Int = 0
     private val songsStorage = SongsStorage
+    var currentTrackLiveData: MutableLiveData<Int> = MutableLiveData()
+    var currentSongTitleLiveData: MutableLiveData<String> = MutableLiveData()
+    var currentSongCoverLiveData: MutableLiveData<Int> = MutableLiveData()
+
 
     fun previousMusicIndex() {
         val newPosition = currentTrackPosition - 1
@@ -14,6 +21,7 @@ object PlayerController {
         } else {
             newPosition
         }
+        currentTrackLiveData.value = newPosition
     }
 
     fun nextMusicIndex() {
@@ -22,25 +30,32 @@ object PlayerController {
             0
         } else {
             newPosition
+
         }
+        currentTrackLiveData.value = newPosition
     }
 
-     fun getSongTitle(): String {
-        return songsStorage.getSongTitle(currentTrackPosition)
+    fun getSongTitle(): String {
+        val currentSongTitle = songsStorage.getSongTitle(currentTrackPosition)
+        currentSongTitleLiveData.value = currentSongTitle
+        return currentSongTitle
     }
 
     fun getSongCover(): Int {
-        return when (songsStorage.tracks[currentTrackPosition]) {
-            "game_of_thrones.mp3" -> R.drawable.game_of_thrones
-            "imperial_marsh.mp3" -> R.drawable.imperial_marsh
-            "harry_potter.mp3" -> R.drawable.harry_potter
+        when (songsStorage.tracks[currentTrackPosition]) {
+            "game_of_thrones.mp3" -> currentSongCoverLiveData.value = R.drawable.game_of_thrones
+            "imperial_marsh.mp3" -> currentSongCoverLiveData.value = R.drawable.imperial_marsh
+            "harry_potter.mp3" -> currentSongCoverLiveData.value = R.drawable.harry_potter
             else -> {
-                R.drawable.game_of_thrones
+                currentSongCoverLiveData.value = R.drawable.game_of_thrones
             }
         }
+        return currentSongCoverLiveData.value!!
     }
 
     fun selectMusicTrack(): String {
-        return songsStorage.tracks[currentTrackPosition]
+        val currentSongTitle = songsStorage.tracks[currentTrackPosition]
+        currentSongTitleLiveData.value = songsStorage.tracks[currentTrackPosition]
+        return currentSongTitle
     }
 }

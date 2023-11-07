@@ -104,6 +104,8 @@ class MusicService : Service() {
 
     private fun nextMusic() {
         playerController.nextMusicIndex()
+        playerController.getSongTitle()
+        playerController.getSongCover()
 
         if (isPlaying) {
             if (player != null) {
