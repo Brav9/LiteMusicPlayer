@@ -8,7 +8,9 @@ import android.os.Build
 
 class RunningApp : Application() {
     override fun onCreate() {
+
         super.onCreate()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -19,5 +21,6 @@ class RunningApp : Application() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+        SongsStorage.loadTracks(assets)
     }
 }

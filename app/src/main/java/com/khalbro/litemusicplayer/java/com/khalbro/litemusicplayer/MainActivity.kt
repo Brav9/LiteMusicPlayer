@@ -9,7 +9,8 @@ import com.khalbro.litemusicplayer.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val musicService = MusicService()
+
+    private val songsStorage = SongsStorage
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,11 +18,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         var isClicked = true
 
-//        binding.tvSongTitle.text = songTitleService()
+       binding.tvSongTitle.text = getSongTitleIntent().toString()
 //        binding.vSongCover.setBackgroundResource(songCoverService())
 
         binding.btnPrevious.setOnClickListener {
             previousMusicService()
+            songTitleService()
+
 //            binding.tvSongTitle.text = songTitleService()
 //            binding.vSongCover.setBackgroundResource(songCoverService())
         }
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             isClicked = if (isClicked) {
                 startService()
                 playStopMusicService()
+//                binding.tvSongTitle.text = songTitleService()
                 binding.btnPlayPause.text = getString(R.string.btn_pause)
                 false
             } else {
@@ -47,13 +51,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun songCoverService(): Int {
+    //    private fun songCoverService(): Int {
 //        return musicService.songCover()
 //    }
 //
-//    private fun songTitleService(): String {
-//        return musicService.songTitle()
-//    }
+    private fun songTitleService() {
+        Intent(applicationContext, MusicService::class.java).also {
+            it.action = MusicService.Actions.GET_SONG_TITLE.toString()
+            it.getStringExtra("ID")
+            startService(it)
+        }
+    }
+    private fun getSongTitleIntent(): Bundle? {
+        val playStopIntent = Intent(this, MusicService::class.java)
+        val bundle: Bundle = Bundle()
+        return playStopIntent.extras
+    }
+
 
     private fun previousMusicService() {
         Intent(applicationContext, MusicService::class.java).also {

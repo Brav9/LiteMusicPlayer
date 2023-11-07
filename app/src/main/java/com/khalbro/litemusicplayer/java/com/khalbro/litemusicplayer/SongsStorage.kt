@@ -4,7 +4,7 @@ import android.content.res.AssetManager
 import androidx.appcompat.app.AppCompatActivity
 import com.khalbro.litemusicplayer.R
 
-class SongsStorage : AppCompatActivity() {
+object SongsStorage {
 
     var tracks = emptyList<String>()
 
@@ -24,7 +24,7 @@ class SongsStorage : AppCompatActivity() {
         return covers[getSongTitle(trackIndex)]
     }
 
-     fun getSongTitle(trackIndex: Int): String {
+    fun getSongTitle(trackIndex: Int): String {
         return tracks[trackIndex]
     }
 }
