@@ -21,10 +21,10 @@ class SongsStorage : AppCompatActivity() {
     }
 
     fun getSongCover(trackIndex: Int): Int? {
-        return covers[getSongTilte(trackIndex)]
+        return covers[getSongTitle(trackIndex)]
     }
 
-    fun getSongTilte(trackIndex: Int): String {
+     fun getSongTitle(trackIndex: Int): String {
         return tracks[trackIndex]
     }
 }
