@@ -9,8 +9,7 @@ import com.khalbro.litemusicplayer.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val songsStorage = SongsStorage
+    private val playerController = PlayerController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,22 +17,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         var isClicked = true
 
-       binding.tvSongTitle.text = getSongTitleIntent().toString()
-//        binding.vSongCover.setBackgroundResource(songCoverService())
+        binding.tvSongTitle.text = playerController.getSongTitle()
+        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
 
         binding.btnPrevious.setOnClickListener {
             previousMusicService()
-            songTitleService()
 
-//            binding.tvSongTitle.text = songTitleService()
-//            binding.vSongCover.setBackgroundResource(songCoverService())
+            binding.tvSongTitle.text = playerController.getSongTitle()
+            binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         }
 
         binding.btnPlayPause.setOnClickListener {
             isClicked = if (isClicked) {
                 startService()
                 playStopMusicService()
-//                binding.tvSongTitle.text = songTitleService()
                 binding.btnPlayPause.text = getString(R.string.btn_pause)
                 false
             } else {
@@ -46,30 +43,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnNext.setOnClickListener {
             nextMusicService()
-//            binding.tvSongTitle.text = songTitleService()
-//            binding.vSongCover.setBackgroundResource(songCoverService())
+            binding.tvSongTitle.text = playerController.getSongTitle()
+            binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         }
     }
-
-    //    private fun songCoverService(): Int {
-//        return musicService.songCover()
-//    }
-//
-    private fun songTitleService() {
-        Intent(applicationContext, MusicService::class.java).also {
-            it.action = MusicService.Actions.GET_SONG_TITLE.toString()
-            it.getStringExtra("ID")
-            startService(it)
-        }
-    }
-    private fun getSongTitleIntent(): Bundle? {
-        val playStopIntent = Intent(this, MusicService::class.java)
-        val bundle: Bundle = Bundle()
-        return playStopIntent.extras
-    }
-
 
     private fun previousMusicService() {
+        binding.tvSongTitle.text = playerController.getSongTitle()
+        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         Intent(applicationContext, MusicService::class.java).also {
             it.action = MusicService.Actions.PREVIOUS_MUSIC.toString()
             startService(it)
@@ -77,6 +58,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nextMusicService() {
+        binding.tvSongTitle.text = playerController.getSongTitle()
+        binding.vSongCover.setBackgroundResource(playerController.getSongCover())
         Intent(applicationContext, MusicService::class.java).also {
             it.action = MusicService.Actions.NEXT_MUSIC.toString()
             startService(it)

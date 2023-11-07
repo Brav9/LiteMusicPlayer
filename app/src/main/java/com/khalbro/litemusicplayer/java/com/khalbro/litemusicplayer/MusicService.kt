@@ -3,15 +3,10 @@ package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
-import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.khalbro.litemusicplayer.R
-
 
 const val CHANNEL_ID = "ID"
 const val CHANNEL_NAME = "NAME"
@@ -20,14 +15,11 @@ class MusicService : Service() {
 
     private var player: MediaPlayer? = null
     private var isPlaying: Boolean = false
-    private val songsStorage = SongsStorage
-    private var currentTrackPosition: Int = 0
-    private var isClicked = true
+    private val playerController = PlayerController
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
@@ -36,33 +28,25 @@ class MusicService : Service() {
             Actions.NEXT_MUSIC.toString() -> nextMusic()
             Actions.PLAY_STOP_MUSIC.toString() -> playStopMusic()
             Actions.PREVIOUS_MUSIC.toString() -> previousMusic()
-            Actions.GET_SONG_TITLE.toString() -> getSongTitle()
-            Actions.GET_GONG_COVER.toString() -> previousMusic()
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
-
     private fun previousMusic() {
-        val newPosition = currentTrackPosition - 1
-        currentTrackPosition = if (newPosition < 0) {
-            2
-        } else {
-            newPosition
-        }
+        playerController.previousMusicIndex()
+        playerController.getSongTitle()
+        playerController.getSongCover()
         if (isPlaying) {
             if (player != null) {
                 player!!.pause()
                 isPlaying = false
                 playStopMusic()
-//                songTitle()
+
             } else {
                 isPlaying = true
-//                songTitle()
             }
         }
     }
-
 
     private fun playStopMusic() {
 
@@ -74,7 +58,7 @@ class MusicService : Service() {
             }
         } else {
             player = MediaPlayer()
-            when (songsStorage.tracks[currentTrackPosition]) {
+            when (playerController.selectMusicTrack()) {
                 "game_of_thrones.mp3" -> {
                     val afd = assets.openFd("tracks/game_of_thrones.mp3")
                     player!!.setDataSource(
@@ -119,12 +103,8 @@ class MusicService : Service() {
     }
 
     private fun nextMusic() {
-        val newPosition = currentTrackPosition + 1
-        currentTrackPosition = if (newPosition > songsStorage.tracks.size - 1) {
-            0
-        } else {
-            newPosition
-        }
+        playerController.nextMusicIndex()
+
         if (isPlaying) {
             if (player != null) {
                 player!!.pause()
@@ -132,7 +112,6 @@ class MusicService : Service() {
                 playStopMusic()
             } else {
                 isPlaying = true
-
             }
         }
     }
@@ -158,31 +137,11 @@ class MusicService : Service() {
             )
             .build()
         startForeground(1, notification)
+        playerController.getSongCover()
     }
 
     enum class Actions {
-        START, STOP, PLAY_STOP_MUSIC, NEXT_MUSIC, PREVIOUS_MUSIC, GET_SONG_TITLE, GET_GONG_COVER
-    }
-
-    private fun getSongTitle(): String {
-        val titleIntent = Intent(this, MusicService::class.java)
-        val bundle: Bundle = Bundle()
-        bundle.putString("ID", songsStorage.getSongTitle(currentTrackPosition))
-        titleIntent.putExtras(bundle)
-        startService(titleIntent)
-
-        return songsStorage.getSongTitle(currentTrackPosition)
-    }
-
-    fun getSongCover(): Int {
-        return when (songsStorage.tracks[currentTrackPosition]) {
-            "game_of_thrones.mp3" -> R.drawable.game_of_thrones
-            "imperial_marsh.mp3" -> R.drawable.imperial_marsh
-            "harry_potter.mp3" -> R.drawable.harry_potter
-            else -> {
-                R.drawable.game_of_thrones
-            }
-        }
+        START, STOP, PLAY_STOP_MUSIC, NEXT_MUSIC, PREVIOUS_MUSIC
     }
 
     private fun playStopAction(): PendingIntent? {
@@ -217,7 +176,6 @@ class MusicService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
     }
-
 
     private fun playStopIcon(isPlaying: Boolean): Int {
         val icon: Int = if (!isPlaying) {
