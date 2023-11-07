@@ -1,7 +1,6 @@
 package com.khalbro.litemusicplayer.java.com.khalbro.litemusicplayer
 
 import android.content.res.AssetManager
-import androidx.appcompat.app.AppCompatActivity
 import com.khalbro.litemusicplayer.R
 
 object SongsStorage {

@@ -32,6 +32,25 @@ class MusicService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+
+    private fun playStopMusic() {
+        playerController.getSongCover()
+        update()
+        if (isPlaying) {
+
+            if (player != null) {
+                player!!.pause()
+                isPlaying = false
+                stopSelf()
+
+            } else {
+                playSong()
+            }
+        } else {
+            playSong()
+        }
+    }
+
     private fun previousMusic() {
         playerController.previousMusicIndex()
         playerController.getSongTitle()
@@ -39,68 +58,19 @@ class MusicService : Service() {
         if (isPlaying) {
             if (player != null) {
                 player!!.pause()
+//                player!!.release()
                 isPlaying = false
                 playStopMusic()
 
             } else {
                 isPlaying = true
-            }
-        }
-    }
 
-    private fun playStopMusic() {
-
-        if (isPlaying) {
-            if (player != null) {
-                player!!.pause()
-                isPlaying = false
-                playStopAction()
             }
         } else {
-            player = MediaPlayer()
-            when (playerController.selectMusicTrack()) {
-                "game_of_thrones.mp3" -> {
-                    val afd = assets.openFd("tracks/game_of_thrones.mp3")
-                    player!!.setDataSource(
-                        afd.fileDescriptor,
-                        afd.startOffset,
-                        afd.length
-                    )
-                    afd.close()
-                    player!!.prepare()
-                    player!!.start()
-                    isPlaying = true
-
-                }
-
-                "imperial_marsh.mp3" -> {
-                    val afd = assets.openFd("tracks/imperial_marsh.mp3")
-                    player!!.setDataSource(
-                        afd.fileDescriptor,
-                        afd.startOffset,
-                        afd.length
-                    )
-                    afd.close()
-                    player!!.prepare()
-                    player!!.start()
-                    isPlaying = true
-                }
-
-                "harry_potter.mp3" -> {
-                    val afd = assets.openFd("tracks/harry_potter.mp3")
-                    player!!.setDataSource(
-                        afd.fileDescriptor,
-                        afd.startOffset,
-                        afd.length
-                    )
-                    afd.close()
-                    player!!.prepare()
-                    player!!.start()
-                    isPlaying = true
-                }
-            }
+            isPlaying = false
         }
     }
+
 
     private fun nextMusic() {
         playerController.nextMusicIndex()
@@ -110,25 +80,33 @@ class MusicService : Service() {
         if (isPlaying) {
             if (player != null) {
                 player!!.pause()
+//                player!!.release()
                 isPlaying = false
                 playStopMusic()
             } else {
                 isPlaying = true
             }
+        } else {
+            isPlaying = false
         }
     }
 
     private fun update() {
-
         val playStopIcon: Int = if (isPlaying) {
-            R.drawable.ic_pause
-        } else {
             R.drawable.ic_play
+        } else {
+            R.drawable.ic_pause
         }
+        val playStopText: String = if (isPlaying) {
+            playerController.getSongTitle()
+        } else {
+            playerController.getSongTitle()
+        }
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Lite Music Player")
-            .setContentText("Playing track")
+            .setContentText(playStopText)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(R.drawable.ic_previous, "Previous", previousAction())
             .addAction(playStopIcon, "Pause", playStopAction())
@@ -139,7 +117,6 @@ class MusicService : Service() {
             )
             .build()
         startForeground(1, notification)
-        playerController.getSongCover()
     }
 
     enum class Actions {
@@ -155,6 +132,7 @@ class MusicService : Service() {
             playStopIntent,
             PendingIntent.FLAG_MUTABLE
         )
+
     }
 
     private fun previousAction(): PendingIntent? {
@@ -179,16 +157,64 @@ class MusicService : Service() {
         )
     }
 
-    private fun playStopIcon(isPlaying: Boolean): Int {
-        val icon: Int = if (!isPlaying) {
-            R.drawable.ic_pause
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isPlaying)
+            stopMusic()
+    }
 
-        } else {
-            R.drawable.ic_play
+    private fun stopMusic() {
+            player!!.stop()
+        player!!.seekTo(0)
+        stopSelf()
+
+    }
+
+    private fun playSong() {
+        player = MediaPlayer()
+        when (playerController.selectMusicTrack()) {
+            "game_of_thrones.mp3" -> {
+                val afd = assets.openFd("tracks/game_of_thrones.mp3")
+                player!!.setDataSource(
+                    afd.fileDescriptor,
+                    afd.startOffset,
+                    afd.length
+                )
+                afd.close()
+                player!!.prepare()
+                player!!.start()
+                isPlaying = true
+            }
+
+            "imperial_marsh.mp3" -> {
+                val afd = assets.openFd("tracks/imperial_marsh.mp3")
+                player!!.setDataSource(
+                    afd.fileDescriptor,
+                    afd.startOffset,
+                    afd.length
+                )
+                afd.close()
+                player!!.prepare()
+                player!!.start()
+                isPlaying = true
+            }
+
+            "harry_potter.mp3" -> {
+                val afd = assets.openFd("tracks/harry_potter.mp3")
+                player!!.setDataSource(
+                    afd.fileDescriptor,
+                    afd.startOffset,
+                    afd.length
+                )
+                afd.close()
+                player!!.prepare()
+                player!!.start()
+                isPlaying = true
+            }
         }
-        return icon
     }
 }
+
 
 
 
